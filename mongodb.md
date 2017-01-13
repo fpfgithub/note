@@ -61,7 +61,7 @@
 
 
 
-
+#EXPLAIN使用查看索引使用情况
 db.factories.find({"metro" : { "city" : "New York", "state" : "NY" }}).explain('allPlansExecution')
 
 添加环境变量PATH :
