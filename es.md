@@ -90,7 +90,9 @@
 	/usr/share/elasticsearch/NOTICE.txt
 
 ###启动
-	[root@fpf152 es]# cat /etc/elasticsearch/elasticsearch.yml
+	/etc/init.d/elasticsearch start
+
+	# cat /etc/elasticsearch/elasticsearch.yml
 	# ======================== Elasticsearch Configuration =========================
 	#
 	# NOTE: Elasticsearch comes with reasonable defaults for most settings.
@@ -191,6 +193,7 @@
 
 	script.file: on
 	如果你不在配置中指定节点的名字，Elasticsearch赋予一个随机的名字在每次重启。
+
 ###kibana 配置
 
 	[root@fpf152 es]# cat /opt/kibana/config/kibana.yml
@@ -275,11 +278,11 @@
 	# logging.verbose: false
 ---
 
-- 行为	解释
-- create	当文档不存在时创建之。详见《创建文档》
-- index	创建新文档或替换已有文档。见《索引文档》和《更新文档》
-- update	局部更新文档。见《局部更新》
-- delete	删除一个文档。见《删除文档》
+-   行为	解释
+-   create	当文档不存在时创建之。详见《创建文档》
+-   index	创建新文档或替换已有文档。见《索引文档》和《更新文档》
+-   update	局部更新文档。见《局部更新》
+-   delete	删除一个文档。见《删除文档》
 
 ---
 ###获取mapping(也称之为模式定义)数据类型
@@ -315,11 +318,11 @@ GET /website/_mapping/blog
 
 
 ###从数据源中取出指定的字段
-	GET /website/_search
+	`GET /website/_search
 	{
 	    "query":   { "match_all": {}},
 	    "_source": [ "title"]
-	}
+	}`
 ###_all字段
 [https://www.elastic.co/guide/en/elasticsearch/reference/2.3/mapping-all-field.html](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/mapping-all-field.html "mapping-all-field.html")
 

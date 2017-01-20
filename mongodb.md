@@ -341,3 +341,18 @@ mongo localhost/testDb -u testDb -p testDb
 ###批量更新 multi:true
 
 	`db.inventory.update({ tags: { $nin: [ "appliances", "school" ] } }, { $set: { sale: false } },{multi:true})`
+
+###查询profiling慢日志
+    `db.system.profile.find({millis:{$gt:100}});
+	system.profile是一个限制集`
+###查询优化tip
+    `在没有更新需要的业务场景下,只查询使用到的字段即可;注意:如果只查询部分字段的话是不能用返回的对象直接进行数据的更新操作的`
+###数组的多键索引
+    `如果对一个值为数组类型的字段创建索引,则会默认对数组中的每一个元素创建索引`
+###管道模式$group $limit
+###片键选择策略
+	*分发写操作
+	*读操作不能太过随机化(尽量局部化)
+	*能保持chunk块能过一直被分割
+	`满足这3点要求的片键通常需要由几个字段进行组合,例如{city:1,_id:1}city字段保证同一个city下的文档尽量在同一个分片上,_id总
+	是变化的的可以保证一直被分割`
