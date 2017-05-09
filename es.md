@@ -459,3 +459,101 @@ GET /website/_mapping/blog
     [https://www.elastic.co/blog/quick-tips-negative-connotation-filter](https://www.elastic.co/blog/quick-tips-negative-connotation-filter "pattern_replace")
 
     `The regex patterns in this example finds a “negative” word (like “not”, “haven’t”, etc) and tags the words immediately preceeding and following    it with a tilde. An important note is that since char_filters are pre-analysis, you should make your patterns case-insensitive using (?i:)`
+## 卸载
+	[root@fpf152 ~]# rpm -e --nodeps elasticsearch
+	Stopping elasticsearch service... OK
+	warning: /etc/sysconfig/elasticsearch saved as /etc/sysconfig/elasticsearch.rpmsave
+	warning: /etc/elasticsearch/elasticsearch.yml saved as /etc/elasticsearch/elasticsearch.yml.rpmsave
+	Deleting log directory... OK
+	Deleting plugins directory... OK
+## RPM安装
+	[root@fpf152 ~]# rpm -ivh elasticsearch-5.2.0.rpm
+	Preparing...                ########################################### [100%]
+	Creating elasticsearch group... OK
+	Creating elasticsearch user... OK
+	   1:elasticsearch          ########################################### [100%]
+	### NOT starting on installation, please execute the following statements to configure elasticsearch service to start automatica           lly using chkconfig
+	 sudo chkconfig --add elasticsearch
+	### You can start elasticsearch service by executing
+	 sudo service elasticsearch start
+## 5.2.0 测试机上安装不成功
+	按照官网https://www.elastic.co/guide/en/elasticsearch/reference/5.1/rpm.html#install-rpm
+	安装了低版本5.1.2
+	rpm方式
+
+## 5.x版本服务启动报错
+	[root@fpf152 ~]# /etc/init.d/elasticsearch start
+	正在启动 elasticsearch：Java HotSpot(TM) 64-Bit Server VM warning: INFO: os::commit_memory(0x0000000094cc0000, 1798569984, 0) failed; error='Cannot allocate memory' (errno=12)
+	#
+	# There is insufficient memory for the Java Runtime Environment to continue.
+	# Native memory allocation (mmap) failed to map 1798569984 bytes for committing reserved memory.
+	# An error report file with more information is saved as:
+	# /tmp/hs_err_pid18536.log
+														   [失败]
+	解决方案：（内存溢出，思路更改JVM内存大小即可）
+	vim /etc/elasticsearch/jvm.options
+
+	# Xms represents the initial size of total heap space
+	# Xmx represents the maximum size of total heap space
+	-Xms128m    (默认为2G)
+	-Xmx128m    (默认为2G)
+## 5.x版本服务启动JAVA_HOME not find
+	[root@fpf152 ~]# sudo -i service elasticsearch start
+	which: no java in (/sbin:/usr/sbin:/bin:/usr/bin)
+	Could not find any executable java binary. Please install java in your PATH or set JAVA_HOME
+	[root@fpf152 ~]#
+	[root@fpf152 ~]#
+	[root@fpf152 ~]#
+	[root@fpf152 ~]# vi /etc/sysconfig/elasticsearch
+## 5.x版本服务启动elasticsearch process is too low
+	[2017-02-06T09:35:25,471][ERROR][o.e.b.Bootstrap          ] [o-IYnu8] node validation exception
+	bootstrap checks failed
+	max file descriptors [65535] for elasticsearch process is too low, increase to at least [65536]
+	[2017-02-06T09:35:25,473][INFO ][o.e.n.Node               ] [o-IYnu8] stopping ...
+	[2017-02-06T09:35:25,557][INFO ][o.e.n.Node               ] [o-IYnu8] stopped
+	[2017-02-06T09:35:25,558][INFO ][o.e.n.Node               ] [o-IYnu8] closing ...
+	[2017-02-06T09:35:25,583][INFO ][o.e.n.Node               ] [o-IYnu8] closed
+    解决办法 vim /etc/security/limits.conf
+
+	# End of file
+	*  soft    nofile  65536
+	*  hard    nofile  65536
+	*  soft    nproc   65536
+	*  hard    nproc   65536
+	65535 => 65536
+## Elasticsearch 5.x head插件安装指南
+	http://blog.csdn.net/napoay/article/details/53896348
+
+## elasticsearch-jieba-plugin 是 Jieba 中文分词插件。
+    https://github.com/sing1ee/elasticsearch-jieba-plugin
+	试用 Elasticsearch 5.1.2 版本，基于 huaban 开源的的 jieba java 实现。
+	使用
+	checkout tag: v5.1.2
+	git checkout v5.1.2
+	运行
+	gradle buildPluginZip 生成zip文件
+	创建 directory ${path.home}/plugins/jieba
+
+	复制zip 文件到分词插件
+	cp build/distributions/elasticsearch-jieba-plugin-5.1.2.zip ${path.home}/plugins/jieba
+	解压缩和 rm zip 文件
+
+	unzip elasticsearch-jieba-plugin-5.1.2.zip
+	rm elasticsearch-jieba-plugin-5.1.2.zip
+	开始 elasticsearch
+	./bin/elasticsearch
+
+	停词 /etc/elasticsearch/stopwords/stopwords.txt 格式
+	它
+	們
+	你
+	您
+	我
+	得
+	很
+
+	同义词 /etc/elasticsearch/synonyms/synonyms.txt 格式
+	北京大学,北大,pku
+	清华大学,清华,Tsinghua University
+
+	自定义词库 /usr/share/elasticsearch/plugins/jieba/user.dict
